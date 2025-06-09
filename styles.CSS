@@ -91,7 +91,7 @@ main {
   cursor: pointer;
 }
 
-/* Calendar Layout */
+/* Calendar */
 .calendar-nav {
   display: flex;
   justify-content: space-between;
