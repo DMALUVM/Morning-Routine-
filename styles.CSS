@@ -4,6 +4,7 @@
   --success: #c8f7c5;
   --warning: #fff6b0;
   --error: #ffc2c2;
+  --highlight: #0077ff;
   --dark: #222;
   --radius: 10px;
 }
@@ -111,7 +112,7 @@ main {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.3rem;
+  gap: 0.4rem;
 }
 
 .calendar-cell {
@@ -123,20 +124,28 @@ main {
   justify-content: center;
   align-items: center;
   font-size: 0.9rem;
-  padding: 0.3rem;
+  padding: 0.4rem;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: transform 0.1s;
+}
+
+.calendar-cell.today {
+  border: 2px solid var(--highlight);
 }
 
 .calendar-cell.full {
   background: var(--success);
 }
+
 .calendar-cell.partial {
   background: var(--warning);
 }
+
 .calendar-cell.none {
   background: var(--error);
 }
+
 .calendar-cell.empty {
   background: transparent;
   box-shadow: none;
