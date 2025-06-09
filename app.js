@@ -10,7 +10,8 @@ const activities = [
 
 const storageKey = 'routineData';
 let data = JSON.parse(localStorage.getItem(storageKey) || '{}');
-const todayStr = new Date().toISOString().split('T')[0];
+const today = new Date(2025, 5, 9); // Fixed to June 9, 2025
+const todayStr = today.toISOString().split('T')[0];
 
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabs = document.querySelectorAll('.tab');
@@ -28,12 +29,12 @@ const editSaveBtn = document.getElementById('edit-save');
 const streakChain = document.getElementById('streak-chain');
 const streakCountEl = document.getElementById('streak-count');
 
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
+let currentMonth = today.getMonth();
+let currentYear = today.getFullYear();
 let editingDate = null;
 
 function renderToday() {
-  todayDateEl.textContent = new Date().toLocaleDateString();
+  todayDateEl.textContent = today.toLocaleDateString();
   form.innerHTML = '';
   activities.forEach(act => {
     const label = document.createElement('label');
@@ -60,19 +61,20 @@ function saveToday() {
 }
 
 function renderCalendar() {
-  const firstDay = new Date(currentYear, currentMonth, 1);
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const startWeekday = firstDay.getDay();
-  const today = new Date().toISOString().split('T')[0];
   calendarGrid.innerHTML = '';
-  monthLabel.textContent = firstDay.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  monthLabel.textContent = new Date(currentYear, currentMonth).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
+  // Empty cells
+  for (let i = 0; i < firstDay; i++) {
+    const div = document.createElement('div');
+    div.className = 'calendar-cell empty';
+    calendarGrid.appendChild(div);
+  }
+
+  // Days
   const required = activities.filter(a => a.required);
-  const rows = [];
-  let row = [];
-
-  for (let i = 0; i < startWeekday; i++) row.push(null);
-
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(currentYear, currentMonth, d);
     const dateStr = date.toISOString().split('T')[0];
@@ -87,40 +89,16 @@ function renderCalendar() {
     if (entry['cold']) bonus.push('🧊');
     if (entry['sauna']) bonus.push('🔥');
 
-    row.push({
-      day: d,
-      dateStr,
-      statusClass,
-      bonus: bonus.join(' '),
-      isToday: dateStr === today
-    });
-
-    if (row.length === 7) {
-      rows.push(row);
-      row = [];
-    }
+    const div = document.createElement('div');
+    div.className = `calendar-cell ${statusClass}`;
+    if (dateStr === todayStr) div.classList.add('today');
+    div.innerHTML = `
+      <div class="day-number">${d}</div>
+      <div class="bonus">${bonus.join(' ')}</div>
+    `;
+    div.addEventListener('click', () => openEditModal(dateStr));
+    calendarGrid.appendChild(div);
   }
-
-  while (row.length < 7) row.push(null);
-  rows.push(row);
-
-  rows.forEach(week => {
-    week.forEach(cell => {
-      const div = document.createElement('div');
-      if (!cell) {
-        div.className = 'calendar-cell empty';
-      } else {
-        div.className = `calendar-cell ${cell.statusClass}`;
-        if (cell.isToday) div.classList.add('today');
-        div.innerHTML = `
-          <div class="day-number">${cell.day}</div>
-          <div class="bonus">${cell.bonus}</div>
-        `;
-        div.addEventListener('click', () => openEditModal(cell.dateStr));
-      }
-      calendarGrid.appendChild(div);
-    });
-  });
 }
 
 function openEditModal(dateStr) {
@@ -172,7 +150,7 @@ function renderStreak() {
   for (let i = 0; i < streak; i++) {
     const link = document.createElement('span');
     link.className = 'chain-link';
-    link.textContent = '🔗';
+    link.textContent = '🔥'; // Changed to 🔥
     streakChain.appendChild(link);
   }
   streakCountEl.textContent = `${streak} day${streak !== 1 ? 's' : ''} in a row`;
