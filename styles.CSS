@@ -1,164 +1,190 @@
-/* ---------- Base Styles ---------- */
+/* Base */
 :root {
-  --green: #c1f0c1;
-  --yellow: #fff6b0;
-  --red: #ffd1d1;
+  --bg: #f5f7fa;
   --accent: #0077ff;
-  --bg: #f6f8fa;
-  --dark: #212121;
+  --text: #222;
+  --success: #c8f7c5;
+  --warning: #fff6b0;
+  --error: #ffc2c2;
+  --border: #ddd;
+  --radius: 10px;
 }
 
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  font-family: system-ui, sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   background: var(--bg);
-  color: var(--dark);
+  color: var(--text);
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
+/* Header */
 header {
   background: var(--accent);
-  color: #fff;
+  color: white;
   padding: 1rem;
   text-align: center;
 }
 
 nav {
-  margin-top: .5rem;
   display: flex;
   justify-content: center;
-  gap: .5rem;
+  margin-top: 0.5rem;
+  gap: 0.5rem;
 }
 
-nav button {
-  background: #fff;
-  color: var(--accent);
+.tab-btn {
+  background: white;
   border: none;
-  padding: .4rem .8rem;
-  border-radius: .5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
   cursor: pointer;
+  font-weight: bold;
+  color: var(--accent);
+  transition: background 0.3s;
 }
 
-nav button.active {
-  background: var(--dark);
-  color: #fff;
+.tab-btn.active {
+  background: var(--text);
+  color: white;
 }
 
+/* Main Views */
 main {
-  flex: 1;
   padding: 1rem;
+  flex: 1;
 }
 
-.view.hidden {
+.tab {
   display: none;
 }
 
-.primary-btn,
-.secondary-btn,
-.icon-btn {
-  border: none;
-  padding: .6rem 1rem;
-  border-radius: .5rem;
-  cursor: pointer;
-  font-size: 1rem;
+.tab.active {
+  display: block;
 }
 
 .primary-btn {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--radius);
   background: var(--accent);
-  color: #fff;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Routine Checkboxes */
+#routine-form,
+#edit-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-top: 1rem;
 }
 
-.secondary-btn,
-.icon-btn {
-  background: #e0e0e0;
-}
-
-ul {
-  list-style: none;
-  margin-top: 1rem;
-}
-
-li {
+#routine-form label,
+#edit-checklist label {
   display: flex;
   align-items: center;
-  gap: .5rem;
-  padding: .5rem 0;
+  gap: 0.6rem;
+  font-size: 1.05rem;
 }
 
-.calendar-header {
+/* Calendar */
+.calendar-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: .5rem;
+  margin: 1rem 0;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: .25rem;
+  gap: 0.4rem;
 }
 
-.day-cell {
-  aspect-ratio: 1 / 1;
+.calendar-cell {
+  background: white;
+  border-radius: var(--radius);
+  aspect-ratio: 1/1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: .5rem;
-  background: #fff;
+  font-size: 0.85rem;
+  padding: 0.3rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   cursor: pointer;
-  font-size: .8rem;
 }
 
-.day-cell.full {
-  background: var(--green);
+.full {
+  background: var(--success);
 }
 
-.day-cell.partial {
-  background: var(--yellow);
+.partial {
+  background: var(--warning);
 }
 
-.day-cell.none {
-  background: var(--red);
+.none {
+  background: var(--error);
 }
 
-.day-number {
-  font-weight: 600;
-}
-
-.emoji {
-  font-size: 1.2rem;
-}
-
+/* Streak Chain */
 .streak-chain {
+  margin-top: 1rem;
   display: flex;
   flex-wrap: wrap;
-  gap: .25rem;
-  margin-top: 1rem;
+  gap: 0.3rem;
 }
 
 .chain-link {
   font-size: 1.5rem;
 }
 
+/* Modal */
 dialog {
-  border: none;
-  border-radius: .5rem;
   padding: 1rem;
-  width: 90%;
+  border: none;
+  border-radius: var(--radius);
   max-width: 400px;
+  width: 90%;
 }
 
+menu {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+menu button {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+menu button[value="cancel"] {
+  background: #ddd;
+}
+
+menu button#edit-save {
+  background: var(--accent);
+  color: white;
+}
+
+/* Responsive */
 @media (min-width: 600px) {
   .calendar-grid {
-    gap: .5rem;
+    gap: 0.6rem;
   }
 }
