@@ -1,123 +1,184 @@
-/* ---------- JavaScript: app.js ---------- */
+// --- Config: Define your habits ---
 const activities = [
-  { id: 'breathwork',  name: 'Breathwork / Mindfulness', required: true,  emoji: '🧘' },
-  { id: 'mobility',    name: 'Mobility / Stretching',     required: true,  emoji: '🤸' },
-  { id: 'hydration',   name: 'Hydration Upon Waking',     required: true,  emoji: '💧' },
-  { id: 'supplements', name: 'Supplements',               required: true,  emoji: '💊' },
-  { id: 'cold',        name: 'Cold Plunge',               required: true,  emoji: '🧊' },
-  { id: 'sauna',       name: 'Sauna',                     required: false, emoji: '🔥' },
-  { id: 'workout',     name: 'Workout / Exercise',        required: true,  emoji: '🏋️' }
+  { id: 'breathwork',  name: '🧘 Breathwork / Mindfulness', required: true },
+  { id: 'mobility',    name: '🤸 Mobility / Stretching',     required: true },
+  { id: 'hydration',   name: '💧 Hydration Upon Waking',     required: true },
+  { id: 'supplements', name: '💊 Supplements',               required: true },
+  { id: 'cold',        name: '🧊 Cold Plunge',               required: true },
+  { id: 'sauna',       name: '🔥 Sauna',                     required: false },
+  { id: 'workout',     name: '🏋️ Workout / Exercise',        required: true }
 ];
 
-const dataKey = 'routineTrackerData';
+const storageKey = 'morningRoutineData';
+let data = JSON.parse(localStorage.getItem(storageKey) || '{}');
 const todayStr = new Date().toISOString().split('T')[0];
-let data = JSON.parse(localStorage.getItem(dataKey) || '{}');
-let currentMonth = new Date(todayStr).getMonth();
-let currentYear = new Date(todayStr).getFullYear();
 
+// DOM Elements
+const tabButtons = document.querySelectorAll('.tab-btn');
+const tabs = document.querySelectorAll('.tab');
 const todayDateEl = document.getElementById('today-date');
-const activityListEl = document.getElementById('activity-list');
+const form = document.getElementById('routine-form');
 const saveBtn = document.getElementById('save-btn');
-const navButtons = document.querySelectorAll('nav button');
+
+// Render Today View
+function renderToday() {
+  todayDateEl.textContent = new Date().toLocaleDateString(undefined, {
+    weekday: 'long', month: 'long', day: 'numeric'
+  });
+
+  form.innerHTML = '';
+  activities.forEach(act => {
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = act.id;
+    checkbox.checked = data[todayStr]?.[act.id] || false;
+    label.appendChild(checkbox);
+    label.append(` ${act.name}`);
+    form.appendChild(label);
+  });
+}
+
+// Save today's routine
+function saveToday() {
+  if (!data[todayStr]) data[todayStr] = {};
+  activities.forEach(act => {
+    const checkbox = form.querySelector(`[name=${act.id}]`);
+    data[todayStr][act.id] = checkbox.checked;
+  });
+  localStorage.setItem(storageKey, JSON.stringify(data));
+  renderCalendar();
+  renderStreak();
+  alert("Routine saved!");
+}
+
+// Tab switching
+tabButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabButtons.forEach(b => b.classList.remove('active'));
+    tabs.forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Event Bindings
+saveBtn.addEventListener('click', saveToday);
+
+// Initial Render
+renderToday();
+// Calendar logic
 const calendarGrid = document.getElementById('calendar-grid');
 const monthLabel = document.getElementById('month-label');
 const prevMonthBtn = document.getElementById('prev-month');
 const nextMonthBtn = document.getElementById('next-month');
-const streakChain = document.getElementById('streak-chain');
-const streakCountEl = document.getElementById('streak-count');
-const editDialog = document.getElementById('edit-dialog');
-const editDateLabel = document.getElementById('edit-date-label');
-const editActivityList = document.getElementById('edit-activity-list');
-const editSaveBtn = document.getElementById('edit-save-btn');
 
-renderTodayView();
-renderCalendar();
-renderStreak();
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
 
-navButtons.forEach(btn => btn.addEventListener('click', switchView));
-saveBtn.addEventListener('click', saveToday);
 prevMonthBtn.addEventListener('click', () => changeMonth(-1));
 nextMonthBtn.addEventListener('click', () => changeMonth(1));
 
-function renderTodayView() {
-  todayDateEl.textContent = formatDate(todayStr);
-  activityListEl.innerHTML = '';
-  activities.forEach(act => {
-    const li = document.createElement('li');
-    const box = document.createElement('input');
-    box.type = 'checkbox';
-    box.id = act.id;
-    box.checked = data[todayStr]?.[act.id] || false;
-    const lab = document.createElement('label');
-    lab.htmlFor = act.id;
-    lab.textContent = `${act.emoji} ${act.name}`;
-    li.append(box, lab);
-    activityListEl.appendChild(li);
-  });
-}
-
-function saveToday() {
-  if (!data[todayStr]) data[todayStr] = {};
-  activities.forEach(act => data[todayStr][act.id] = document.getElementById(act.id).checked);
-  localStorage.setItem(dataKey, JSON.stringify(data));
-  renderCalendar();
-  renderStreak();
-  alert('Saved!');
-}
-
-function switchView(e) {
-  const tgt = e.target.getAttribute('data-view');
-  document.querySelector('.view:not(.hidden)').classList.add('hidden');
-  document.getElementById(`${tgt}-view`).classList.remove('hidden');
-  navButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-view') === tgt));
-}
-
-function changeMonth(delta) {
-  currentMonth += delta;
+function changeMonth(offset) {
+  currentMonth += offset;
   if (currentMonth < 0) { currentMonth = 11; currentYear--; }
   if (currentMonth > 11) { currentMonth = 0; currentYear++; }
   renderCalendar();
 }
 
 function renderCalendar() {
-  const first = new Date(currentYear, currentMonth, 1);
-  const days = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const firstDay = new Date(currentYear, currentMonth, 1);
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   calendarGrid.innerHTML = '';
-  monthLabel.textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-  for (let i = 0; i < first.getDay(); i++) calendarGrid.appendChild(document.createElement('div'));
-  for (let d = 1; d <= days; d++) {
-    const dateObj = new Date(currentYear, currentMonth, d);
-    const dateStr = dateObj.toISOString().split('T')[0];
+  monthLabel.textContent = firstDay.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+
+  // Blank starting cells
+  for (let i = 0; i < firstDay.getDay(); i++) {
+    const spacer = document.createElement('div');
+    calendarGrid.appendChild(spacer);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(currentYear, currentMonth, day);
+    const dateStr = date.toISOString().split('T')[0];
     const cell = document.createElement('div');
-    cell.className = `day-cell ${getStatus(dateStr)}`;
-    cell.dataset.date = dateStr;
-    cell.innerHTML = `<span class="day-number">${d}</span><span class="emoji">${statusEmoji(getStatus(dateStr))}</span>`;
-    cell.addEventListener('click', () => openEdit(dateStr));
+    cell.className = `calendar-cell ${getDayStatus(dateStr)}`;
+    cell.innerHTML = `<strong>${day}</strong><span>${statusEmoji(getDayStatus(dateStr))}</span>`;
+    cell.addEventListener('click', () => openEditModal(dateStr));
     calendarGrid.appendChild(cell);
   }
 }
 
-function getStatus(dateStr) {
+function getDayStatus(dateStr) {
   const entry = data[dateStr];
   if (!entry) return 'none';
   const required = activities.filter(a => a.required);
-  const doneReq = required.filter(a => entry[a.id]).length;
-  if (doneReq === 0) return 'none';
-  if (doneReq === required.length) return 'full';
+  const completed = required.filter(a => entry[a.id]).length;
+  if (completed === 0) return 'none';
+  if (completed === required.length) return 'full';
   return 'partial';
 }
 
-function statusEmoji(s) {
-  return s === 'full' ? '✅' : s === 'partial' ? '🟡' : '❌';
+function statusEmoji(status) {
+  if (status === 'full') return '✅';
+  if (status === 'partial') return '🟡';
+  return '❌';
 }
+
+// Modal edit logic
+const editModal = document.getElementById('edit-modal');
+const editDateTitle = document.getElementById('edit-date-title');
+const editChecklist = document.getElementById('edit-checklist');
+const editSaveBtn = document.getElementById('edit-save');
+let editingDate = null;
+
+function openEditModal(dateStr) {
+  editingDate = dateStr;
+  editDateTitle.textContent = `Edit ${new Date(dateStr).toLocaleDateString()}`;
+  editChecklist.innerHTML = '';
+
+  activities.forEach(act => {
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = act.id;
+    checkbox.checked = data[dateStr]?.[act.id] || false;
+    label.appendChild(checkbox);
+    label.append(` ${act.name}`);
+    editChecklist.appendChild(label);
+  });
+
+  editModal.showModal();
+}
+
+editSaveBtn.addEventListener('click', () => {
+  if (!data[editingDate]) data[editingDate] = {};
+  activities.forEach(act => {
+    const box = editChecklist.querySelector(`[name=${act.id}]`);
+    data[editingDate][act.id] = box.checked;
+  });
+  localStorage.setItem(storageKey, JSON.stringify(data));
+  renderCalendar();
+  renderStreak();
+});
+// Streak tracker
+const streakChain = document.getElementById('streak-chain');
+const streakCountEl = document.getElementById('streak-count');
 
 function renderStreak() {
   let streak = 0;
-  let d = new Date(todayStr);
-  while (getStatus(d.toISOString().split('T')[0]) === 'full') {
-    streak++;
-    d.setDate(d.getDate() - 1);
+  let date = new Date(todayStr);
+
+  while (true) {
+    const str = date.toISOString().split('T')[0];
+    if (getDayStatus(str) === 'full') {
+      streak++;
+      date.setDate(date.getDate() - 1);
+    } else {
+      break;
+    }
   }
+
   streakChain.innerHTML = '';
   for (let i = 0; i < streak; i++) {
     const link = document.createElement('span');
@@ -125,34 +186,10 @@ function renderStreak() {
     link.textContent = '🔗';
     streakChain.appendChild(link);
   }
+
   streakCountEl.textContent = `${streak} day${streak === 1 ? '' : 's'} in a row`;
 }
 
-function openEdit(dateStr) {
-  editDateLabel.textContent = `Edit ${formatDate(dateStr)}`;
-  editActivityList.innerHTML = '';
-  activities.forEach(act => {
-    const li = document.createElement('li');
-    const box = document.createElement('input');
-    box.type = 'checkbox';
-    box.id = `edit-${act.id}`;
-    box.checked = data[dateStr]?.[act.id] || false;
-    const lab = document.createElement('label');
-    lab.htmlFor = box.id;
-    lab.textContent = `${act.emoji} ${act.name}`;
-    li.append(box, lab);
-    editActivityList.appendChild(li);
-  });
-  editSaveBtn.onclick = () => {
-    if (!data[dateStr]) data[dateStr] = {};
-    activities.forEach(act => data[dateStr][act.id] = document.getElementById(`edit-${act.id}`).checked);
-    localStorage.setItem(dataKey, JSON.stringify(data));
-    renderCalendar();
-    renderStreak();
-  };
-  editDialog.showModal();
-}
-
-function formatDate(s) {
-  return new Date(s).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-}
+// Final rendering after loading app
+renderCalendar();
+renderStreak();
