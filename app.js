@@ -3,7 +3,7 @@ const activities = [
   { id: 'mobility', name: '🤸 Mobility', required: true },
   { id: 'hydration', name: '💧 Hydration', required: true },
   { id: 'supplements', name: '💊 Supplements', required: true },
-  { id: 'cold', name: '🧊 Cold Plunge', required: true },
+  { id: 'cold', name: '🧊 Cold Plunge', required: false },
   { id: 'sauna', name: '🔥 Sauna', required: false },
   { id: 'workout', name: '🏋️ Workout', required: true }
 ];
@@ -60,40 +60,42 @@ function saveToday() {
 }
 
 function renderCalendar() {
-  const first = new Date(currentYear, currentMonth, 1);
-  const days = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const firstDay = new Date(currentYear, currentMonth, 1);
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const startWeekday = firstDay.getDay();
   calendarGrid.innerHTML = '';
-  monthLabel.textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  monthLabel.textContent = firstDay.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
-  for (let i = 0; i < first.getDay(); i++) {
+  for (let i = 0; i < startWeekday; i++) {
     const spacer = document.createElement('div');
+    spacer.className = 'calendar-cell empty';
     calendarGrid.appendChild(spacer);
   }
 
-  for (let d = 1; d <= days; d++) {
+  for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(currentYear, currentMonth, d);
     const dateStr = date.toISOString().split('T')[0];
-    const status = getStatus(dateStr);
+    const entry = data[dateStr] || {};
+    const required = activities.filter(a => a.required);
+    const completed = required.filter(a => entry[a.id]).length;
+
+    let statusClass = 'none';
+    if (completed === required.length) statusClass = 'full';
+    else if (completed > 0) statusClass = 'partial';
+
+    const bonus = [];
+    if (entry['cold']) bonus.push('🧊');
+    if (entry['sauna']) bonus.push('🔥');
+
     const cell = document.createElement('div');
-    cell.className = `calendar-cell ${status}`;
-    cell.innerHTML = `<strong>${d}</strong><span>${statusEmoji(status)}</span>`;
+    cell.className = `calendar-cell ${statusClass}`;
+    cell.innerHTML = `
+      <div class="day-number">${d}</div>
+      <div class="bonus">${bonus.join(' ')}</div>
+    `;
     cell.addEventListener('click', () => openEditModal(dateStr));
     calendarGrid.appendChild(cell);
   }
-}
-
-function getStatus(dateStr) {
-  const entry = data[dateStr];
-  if (!entry) return 'none';
-  const req = activities.filter(a => a.required);
-  const done = req.filter(a => entry[a.id]).length;
-  if (done === 0) return 'none';
-  if (done === req.length) return 'full';
-  return 'partial';
-}
-
-function statusEmoji(s) {
-  return s === 'full' ? '✅' : s === 'partial' ? '🟡' : '❌';
 }
 
 function openEditModal(dateStr) {
@@ -127,10 +129,20 @@ editSaveBtn.addEventListener('click', () => {
 function renderStreak() {
   let streak = 0;
   let d = new Date(todayStr);
-  while (getStatus(d.toISOString().split('T')[0]) === 'full') {
-    streak++;
-    d.setDate(d.getDate() - 1);
+  while (true) {
+    const ds = d.toISOString().split('T')[0];
+    const entry = data[ds];
+    if (!entry) break;
+    const required = activities.filter(a => a.required);
+    const completed = required.filter(a => entry[a.id]).length;
+    if (completed === required.length) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
   }
+
   streakChain.innerHTML = '';
   for (let i = 0; i < streak; i++) {
     const link = document.createElement('span');
@@ -150,8 +162,25 @@ tabButtons.forEach(btn => {
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 });
-prevMonthBtn.addEventListener('click', () => { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(); });
-nextMonthBtn.addEventListener('click', () => { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); });
+
+prevMonthBtn.addEventListener('click', () => {
+  currentMonth--;
+  if (currentMonth < 0) {
+    currentMonth = 11;
+    currentYear--;
+  }
+  renderCalendar();
+});
+
+nextMonthBtn.addEventListener('click', () => {
+  currentMonth++;
+  if (currentMonth > 11) {
+    currentMonth = 0;
+    currentYear++;
+  }
+  renderCalendar();
+});
+
 saveBtn.addEventListener('click', saveToday);
 
 // Init
