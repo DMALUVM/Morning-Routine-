@@ -62,7 +62,8 @@ function saveToday() {
 function renderCalendar() {
   const firstDay = new Date(currentYear, currentMonth, 1);
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const startWeekday = firstDay.getDay(); // Sunday = 0
+  const startWeekday = firstDay.getDay();
+  const today = new Date().toISOString().split('T')[0];
   calendarGrid.innerHTML = '';
   monthLabel.textContent = firstDay.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
@@ -90,7 +91,8 @@ function renderCalendar() {
       day: d,
       dateStr,
       statusClass,
-      bonus: bonus.join(' ')
+      bonus: bonus.join(' '),
+      isToday: dateStr === today
     });
 
     if (row.length === 7) {
@@ -109,6 +111,7 @@ function renderCalendar() {
         div.className = 'calendar-cell empty';
       } else {
         div.className = `calendar-cell ${cell.statusClass}`;
+        if (cell.isToday) div.classList.add('today');
         div.innerHTML = `
           <div class="day-number">${cell.day}</div>
           <div class="bonus">${cell.bonus}</div>
