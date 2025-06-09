@@ -62,40 +62,62 @@ function saveToday() {
 function renderCalendar() {
   const firstDay = new Date(currentYear, currentMonth, 1);
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const startWeekday = firstDay.getDay();
+  const startWeekday = firstDay.getDay(); // Sunday = 0
   calendarGrid.innerHTML = '';
   monthLabel.textContent = firstDay.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
-  for (let i = 0; i < startWeekday; i++) {
-    const spacer = document.createElement('div');
-    spacer.className = 'calendar-cell empty';
-    calendarGrid.appendChild(spacer);
-  }
+  const required = activities.filter(a => a.required);
+  const rows = [];
+  let row = [];
+
+  for (let i = 0; i < startWeekday; i++) row.push(null);
 
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(currentYear, currentMonth, d);
     const dateStr = date.toISOString().split('T')[0];
     const entry = data[dateStr] || {};
-    const required = activities.filter(a => a.required);
-    const completed = required.filter(a => entry[a.id]).length;
+    const doneRequired = required.filter(a => entry[a.id]).length;
 
     let statusClass = 'none';
-    if (completed === required.length) statusClass = 'full';
-    else if (completed > 0) statusClass = 'partial';
+    if (doneRequired === required.length) statusClass = 'full';
+    else if (doneRequired > 0) statusClass = 'partial';
 
     const bonus = [];
     if (entry['cold']) bonus.push('🧊');
     if (entry['sauna']) bonus.push('🔥');
 
-    const cell = document.createElement('div');
-    cell.className = `calendar-cell ${statusClass}`;
-    cell.innerHTML = `
-      <div class="day-number">${d}</div>
-      <div class="bonus">${bonus.join(' ')}</div>
-    `;
-    cell.addEventListener('click', () => openEditModal(dateStr));
-    calendarGrid.appendChild(cell);
+    row.push({
+      day: d,
+      dateStr,
+      statusClass,
+      bonus: bonus.join(' ')
+    });
+
+    if (row.length === 7) {
+      rows.push(row);
+      row = [];
+    }
   }
+
+  while (row.length < 7) row.push(null);
+  rows.push(row);
+
+  rows.forEach(week => {
+    week.forEach(cell => {
+      const div = document.createElement('div');
+      if (!cell) {
+        div.className = 'calendar-cell empty';
+      } else {
+        div.className = `calendar-cell ${cell.statusClass}`;
+        div.innerHTML = `
+          <div class="day-number">${cell.day}</div>
+          <div class="bonus">${cell.bonus}</div>
+        `;
+        div.addEventListener('click', () => openEditModal(cell.dateStr));
+      }
+      calendarGrid.appendChild(div);
+    });
+  });
 }
 
 function openEditModal(dateStr) {
@@ -153,7 +175,6 @@ function renderStreak() {
   streakCountEl.textContent = `${streak} day${streak !== 1 ? 's' : ''} in a row`;
 }
 
-// Events
 tabButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     tabButtons.forEach(b => b.classList.remove('active'));
@@ -183,7 +204,6 @@ nextMonthBtn.addEventListener('click', () => {
 
 saveBtn.addEventListener('click', saveToday);
 
-// Init
 renderToday();
 renderCalendar();
 renderStreak();
