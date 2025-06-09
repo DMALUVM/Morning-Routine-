@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Morning Routine Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Morning Routine Tracker</h1>
+    <nav>
+      <button data-view="today" class="active">Today</button>
+      <button data-view="calendar">Calendar</button>
+      <button data-view="streak">Streak</button>
+    </nav>
+  </header>
+
+  <main id="view-container">
+    <!-- Today -->
+    <section id="today-view" class="view">
+      <h2 id="today-date"></h2>
+      <ul id="activity-list"></ul>
+      <button id="save-btn" class="primary-btn">Save Today</button>
+    </section>
+
+    <!-- Calendar -->
+    <section id="calendar-view" class="view hidden">
+      <div class="calendar-header">
+        <button id="prev-month" class="icon-btn">◀</button>
+        <h2 id="month-label"></h2>
+        <button id="next-month" class="icon-btn">▶</button>
+      </div>
+      <div id="calendar-grid" class="calendar-grid"></div>
+    </section>
+
+    <!-- Streak -->
+    <section id="streak-view" class="view hidden">
+      <h2>Current Streak</h2>
+      <div id="streak-chain" class="streak-chain"></div>
+      <p id="streak-count"></p>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <dialog id="edit-dialog">
+    <form method="dialog">
+      <h3 id="edit-date-label"></h3>
+      <ul id="edit-activity-list"></ul>
+      <menu>
+        <button value="cancel" class="secondary-btn">Cancel</button>
+        <button id="edit-save-btn" value="save" class="primary-btn">Save</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
