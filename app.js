@@ -10,7 +10,7 @@ const activities = [
 
 const storageKey = 'routineData';
 let data = JSON.parse(localStorage.getItem(storageKey) || '{}');
-const today = new Date(2025, 5, 9); // June 9, 2025
+const today = new Date();
 const todayStr = today.toISOString().split('T')[0];
 
 const tabButtons = document.querySelectorAll('.tab-btn');
@@ -46,7 +46,6 @@ function renderToday() {
   });
   updateTodayStatus();
 }
-
 function updateTodayStatus() {
   const entry = data[todayStr] || {};
   const required = activities.filter(a => a.required);
@@ -80,13 +79,14 @@ function renderCalendar() {
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   monthLabel.textContent = new Date(currentYear, currentMonth).toLocaleDateString('default', { month: 'long', year: 'numeric' });
 
-  // Empty cells for start of month
+  const required = activities.filter(a => a.required);
+
   for (let i = 0; i < firstDay; i++) {
-    calendarGrid.innerHTML += '<div class="calendar-cell empty"></div>';
+    const emptyCell = document.createElement('div');
+    emptyCell.className = 'calendar-cell empty';
+    calendarGrid.appendChild(emptyCell);
   }
 
-  // Days
-  const required = activities.filter(a => a.required);
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(currentYear, currentMonth, d);
     const dateStr = date.toISOString().split('T')[0];
@@ -101,14 +101,17 @@ function renderCalendar() {
     if (entry['cold']) bonus.push('🧊');
     if (entry['sauna']) bonus.push('🔥');
 
-    calendarGrid.innerHTML += `
-      <div class="calendar-cell ${statusClass} ${dateStr === todayStr ? 'today' : ''}" data-date="${dateStr}">
-        <div class="day-number">${d}</div>
-        <div class="bonus">${bonus.join(' ')}</div>
-      </div>`;
+    const cell = document.createElement('div');
+    cell.className = `calendar-cell ${statusClass}`;
+    if (dateStr === todayStr) {
+      cell.classList.add('today');
+    }
+    cell.dataset.date = dateStr;
+    cell.innerHTML = `<div class="day-number">${d}</div><div class="bonus">${bonus.join(' ')}</div>`;
+    cell.addEventListener('click', () => openEditModal(dateStr));
+    calendarGrid.appendChild(cell);
   }
 }
-
 function openEditModal(dateStr) {
   editDateTitle.textContent = `Edit ${new Date(dateStr).toLocaleDateString()}`;
   editChecklist.innerHTML = '';
@@ -140,13 +143,6 @@ editSaveBtn.addEventListener('click', () => {
 });
 
 cancelBtn.addEventListener('click', closeModal);
-
-calendarGrid.addEventListener('click', e => {
-  const cell = e.target.closest('.calendar-cell');
-  if (cell && !cell.classList.contains('empty')) {
-    openEditModal(cell.dataset.date);
-  }
-});
 
 prevMonthBtn.addEventListener('click', () => {
   currentMonth--;
