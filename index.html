@@ -1,47 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Morning Routine Tracker</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="bg-gray-100 font-sans">
-  <header class="bg-blue-600 text-white p-4 shadow-md">
-    <h1 class="text-2xl font-bold text-center">🌅 Morning Routine Tracker</h1>
-    <nav class="flex justify-center gap-2 mt-2">
-      <button class="tab-btn active" data-tab="calendar">Calendar</button>
-    </nav>
-  </header>
 
-  <main class="container mx-auto p-4">
-    <!-- Calendar View -->
-    <section id="calendar" class="tab">
-      <div class="calendar-nav">
-        <button id="prev-month">◀</button>
-        <span id="month-label" class="text-lg font-semibold"></span>
-        <button id="next-month">▶</button>
+<body class="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white">
+  <div class="max-w-4xl mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4 text-center">🌅 Morning Routine Tracker</h1>
+
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <p id="streak" class="text-sm">🔥 Streak: 0 days</p>
+        <p id="ytd" class="text-sm">📆 YTD: 0 days</p>
       </div>
-      <div class="calendar-weekdays">
-        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-      </div>
-      <div id="calendar-grid" class="calendar-grid"></div>
-    </section>
-  </main>
+      <button id="prevMonth" class="text-blue-500 hover:underline">← Prev</button>
+      <h2 id="monthYear" class="font-semibold text-lg"></h2>
+      <button id="nextMonth" class="text-blue-500 hover:underline">Next →</button>
+    </div>
+
+    <div id="calendar" class="grid grid-cols-7 gap-1 text-center text-sm">
+      <!-- Day headers -->
+      <div class="font-bold">Sun</div>
+      <div class="font-bold">Mon</div>
+      <div class="font-bold">Tue</div>
+      <div class="font-bold">Wed</div>
+      <div class="font-bold">Thu</div>
+      <div class="font-bold">Fri</div>
+      <div class="font-bold">Sat</div>
+    </div>
+  </div>
 
   <!-- Modal -->
-  <div id="edit-modal" class="modal">
-    <div class="modal-content">
-      <h3 id="edit-date-title" class="text-lg font-semibold mb-2"></h3>
-      <div id="edit-checklist" class="space-y-2"></div>
-      <div class="modal-actions">
-        <button class="modal-btn cancel-btn">Cancel</button>
-        <button id="edit-save" class="modal-btn save-btn">Save</button>
-      </div>
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-4 w-80">
+      <h3 class="text-lg font-bold mb-2 text-center">Edit Day</h3>
+      <form id="editForm" class="grid gap-2">
+        <label><input type="checkbox" name="breathwork" /> 🧘 Breathwork</label>
+        <label><input type="checkbox" name="hydration" /> 💧 Hydration</label>
+        <label><input type="checkbox" name="reading" /> 📖 Reading</label>
+        <label><input type="checkbox" name="mobility" /> 🤸 Mobility</label>
+        <label><input type="checkbox" name="exercise" /> 🏋️ Exercise</label>
+        <label><input type="checkbox" name="sauna" /> 🔥 Sauna</label>
+        <label><input type="checkbox" name="cold" /> 🧊 Cold Plunge</label>
+        <div class="flex justify-between mt-3">
+          <button type="button" id="cancelEdit" class="text-sm text-gray-600 dark:text-gray-300">Cancel</button>
+          <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <script src="app.js"></script>
 </body>
+
 </html>
