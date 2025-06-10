@@ -17,8 +17,8 @@ const activities = {
   reading: "📖",
   mobility: "🤸",
   exercise: "🏋️",
-  sauna: "🔥", // optional
-  cold: "🧊",  // optional
+  sauna: "🔥",
+  cold: "🧊",
 };
 
 const requiredKeys = ["breathwork", "hydration", "reading", "mobility", "exercise"];
@@ -37,7 +37,7 @@ function renderCalendar() {
   const startDay = firstDay.getDay();
   const daysInMonth = lastDay.getDate();
 
-  // Clear existing content (preserve day headers)
+  // Preserve day headers
   calendarEl.innerHTML = `
     <div class="font-bold">Sun</div>
     <div class="font-bold">Mon</div>
@@ -86,7 +86,7 @@ function updateStats() {
   while (true) {
     const key = getDateKey(current);
     const entry = data[key];
-    const ok = entry && requiredKeys.every((k) => entry[k]);
+    const ok = entry && requiredKeys.every(k => entry[k]);
     if (ok) {
       streak++;
       current.setDate(current.getDate() - 1);
@@ -140,9 +140,11 @@ document.getElementById("prevMonth").addEventListener("click", () => {
   currentDate.setMonth(currentDate.getMonth() - 1);
   renderCalendar();
 });
+
 document.getElementById("nextMonth").addEventListener("click", () => {
   currentDate.setMonth(currentDate.getMonth() + 1);
   renderCalendar();
 });
 
+// Initialize
 renderCalendar();
