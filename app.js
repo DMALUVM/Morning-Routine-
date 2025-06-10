@@ -46,6 +46,7 @@ function renderToday() {
   });
   updateTodayStatus();
 }
+
 function updateTodayStatus() {
   const entry = data[todayStr] || {};
   const required = activities.filter(a => a.required);
@@ -79,39 +80,15 @@ function renderCalendar() {
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   monthLabel.textContent = new Date(currentYear, currentMonth).toLocaleDateString('default', { month: 'long', year: 'numeric' });
 
-  const required = activities.filter(a => a.required);
-
+  // Empty cells
   for (let i = 0; i < firstDay; i++) {
-    const emptyCell = document.createElement('div');
-    emptyCell.className = 'calendar-cell empty';
-    calendarGrid.appendChild(emptyCell);
+    calendarGrid.innerHTML += `<div class="calendar-cell empty"></div>`;
   }
 
+  // Days
+  const required = activities.filter(a => a.required);
   for (let d = 1; d <= daysInMonth; d++) {
-    const date = new Date(currentYear, currentMonth, d);
-    const dateStr = date.toISOString().split('T')[0];
-    const entry = data[dateStr] || {};
-    const doneRequired = required.filter(a => entry[a.id]).length;
-
-    let statusClass = 'none';
-    if (doneRequired === required.length) statusClass = 'full';
-    else if (doneRequired > 0) statusClass = 'partial';
-
-    const bonus = [];
-    if (entry['cold']) bonus.push('🧊');
-    if (entry['sauna']) bonus.push('🔥');
-
-    const cell = document.createElement('div');
-    cell.className = `calendar-cell ${statusClass}`;
-    if (dateStr === todayStr) {
-      cell.classList.add('today');
-    }
-    cell.dataset.date = dateStr;
-    cell.innerHTML = `<div class="day-number">${d}</div><div class="bonus">${bonus.join(' ')}</div>`;
-    cell.addEventListener('click', () => openEditModal(dateStr));
-    calendarGrid.appendChild(cell);
-  }
-}
+    const
 function openEditModal(dateStr) {
   editDateTitle.textContent = `Edit ${new Date(dateStr).toLocaleDateString()}`;
   editChecklist.innerHTML = '';
@@ -122,6 +99,7 @@ function openEditModal(dateStr) {
         <span>${act.name}</span>
       </label>`;
   });
+  editModal.dataset.date = dateStr;
   editModal.classList.add('open');
 }
 
@@ -130,7 +108,7 @@ function closeModal() {
 }
 
 editSaveBtn.addEventListener('click', () => {
-  const dateStr = new Date(editDateTitle.textContent.replace('Edit ', '')).toISOString().split('T')[0];
+  const dateStr = editModal.dataset.date;
   if (!data[dateStr]) data[dateStr] = {};
   activities.forEach(act => {
     const box = editChecklist.querySelector(`[name="${act.id}"]`);
@@ -143,6 +121,13 @@ editSaveBtn.addEventListener('click', () => {
 });
 
 cancelBtn.addEventListener('click', closeModal);
+
+calendarGrid.addEventListener('click', e => {
+  const cell = e.target.closest('.calendar-cell');
+  if (cell && !cell.classList.contains('empty')) {
+    openEditModal(cell.dataset.date);
+  }
+});
 
 prevMonthBtn.addEventListener('click', () => {
   currentMonth--;
