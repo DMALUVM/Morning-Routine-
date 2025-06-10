@@ -73,22 +73,54 @@ function saveToday() {
   renderStreak();
   alert('Saved!');
 }
-
 function renderCalendar() {
   calendarGrid.innerHTML = '';
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  monthLabel.textContent = new Date(currentYear, currentMonth).toLocaleDateString('default', { month: 'long', year: 'numeric' });
+  const monthDate = new Date(currentYear, currentMonth);
+  monthLabel.textContent = monthDate.toLocaleDateString('default', { month: 'long', year: 'numeric' });
 
-  // Empty cells
   for (let i = 0; i < firstDay; i++) {
-    calendarGrid.innerHTML += `<div class="calendar-cell empty"></div>`;
+    const cell = document.createElement('div');
+    cell.classList.add('calendar-cell', 'empty');
+    calendarGrid.appendChild(cell);
   }
 
-  // Days
-  const required = activities.filter(a => a.required);
-  for (let d = 1; d <= daysInMonth; d++) {
-    const
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(currentYear, currentMonth, day);
+    const dateStr = date.toISOString().split('T')[0];
+    const entry = data[dateStr] || {};
+    const required = activities.filter(a => a.required);
+    const doneRequired = required.filter(a => entry[a.id]).length;
+
+    const cell = document.createElement('div');
+    cell.classList.add('calendar-cell');
+    cell.dataset.date = dateStr;
+
+    // Completion background color
+    if (doneRequired === required.length) {
+      cell.classList.add('full');
+    } else if (doneRequired > 0) {
+      cell.classList.add('partial');
+    } else if (Object.keys(entry).length > 0) {
+      cell.classList.add('none');
+    }
+
+    // Highlight today
+    if (dateStr === todayStr) {
+      cell.classList.add('today');
+    }
+
+    cell.innerHTML = `<div class="day-number">${day}</div>`;
+
+    // Bonus indicators
+    if (entry['cold']) cell.innerHTML += `<div class="bonus">🧊</div>`;
+    if (entry['sauna']) cell.innerHTML += `<div class="bonus">🔥</div>`;
+
+    calendarGrid.appendChild(cell);
+  }
+}
+
 function openEditModal(dateStr) {
   editDateTitle.textContent = `Edit ${new Date(dateStr).toLocaleDateString()}`;
   editChecklist.innerHTML = '';
