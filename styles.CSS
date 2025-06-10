@@ -1,149 +1,128 @@
-:root {
-  --bg: #f7f9fb;
-  --accent: #0077ff;
-  --success: #c8f7c5;
-  --warning: #fff6b0;
-  --error: #ffc2c2;
-  --highlight: #0077ff;
-  --dark: #222;
-  --radius: 10px;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: var(--bg);
-  color: var(--dark);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-header {
-  background: var(--accent);
-  color: white;
-  padding: 1rem;
-  text-align: center;
-}
-
-nav {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
 .tab-btn {
   background: white;
-  color: var(--accent);
-  border: none;
+  color: #2563eb;
   padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  font-weight: bold;
-  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  background: #e6f0ff;
 }
 
 .tab-btn.active {
-  background: var(--dark);
+  background: #1e40af;
   color: white;
 }
 
-main {
-  padding: 1rem;
-  flex: 1;
-}
-
-.tab {
+.tab.hidden {
   display: none;
 }
 
-.tab.active {
-  display: block;
-}
-
-/* Today View */
-#routine-form {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-#routine-form label {
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 .primary-btn {
-  margin-top: 1rem;
-  background: var(--accent);
+  background: #2563eb;
   color: white;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s;
 }
 
-/* Calendar */
+.primary-btn:hover {
+  background: #1e40af;
+}
+
+.status-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin: 0.5rem 0;
+}
+
+.status-indicator.full {
+  background: #86efac;
+}
+
+.status-indicator.partial {
+  background: #fef08a;
+}
+
+.status-indicator.none {
+  background: #f87171;
+}
+
 .calendar-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-  font-weight: bold;
+}
+
+.calendar-nav button {
+  background: none;
+  color: #2563eb;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+}
+
+.calendar-nav button:hover {
+  color: #1e40af;
 }
 
 .calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
-  font-weight: bold;
+  font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .calendar-cell {
   background: white;
-  border-radius: var(--radius);
-  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  aspect-ratio: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 0.9rem;
-  padding: 0.4rem;
+  padding: 0.5rem;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-  transition: transform 0.1s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.calendar-cell:hover:not(.empty) {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .calendar-cell.today {
-  border: 2px solid var(--highlight);
+  border: 2px solid #2563eb;
 }
 
 .calendar-cell.full {
-  background: var(--success);
+  background: #86efac;
 }
 
 .calendar-cell.partial {
-  background: var(--warning);
+  background: #fef08a;
 }
 
 .calendar-cell.none {
-  background: var(--error);
+  background: #f87171;
 }
 
 .calendar-cell.empty {
@@ -153,7 +132,7 @@ main {
 }
 
 .day-number {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 1rem;
 }
 
@@ -162,52 +141,92 @@ main {
   margin-top: 0.2rem;
 }
 
-/* Streak View */
 .streak-chain {
-  margin-top: 1rem;
+  margin: 1rem 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
+  gap: 0.5rem;
+  justify-content: center;
 }
+
 .chain-link {
   font-size: 1.5rem;
 }
 
-/* Modal */
-dialog {
-  border: none;
-  border-radius: var(--radius);
-  padding: 1rem;
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal.open {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
   width: 90%;
   max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.2s ease-out;
 }
 
-#edit-checklist label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-menu {
+.modal-actions {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
 }
 
-menu button {
+.modal-btn {
   padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s;
 }
 
-menu button[value="cancel"] {
-  background: #ddd;
+.cancel-btn {
+  background: #e5e7eb;
 }
 
-menu button#edit-save {
-  background: var(--accent);
+.cancel-btn:hover {
+  background: #d1d5db;
+}
+
+.save-btn {
+  background: #2563eb;
   color: white;
+}
+
+.save-btn:hover {
+  background: #1e40af;
+}
+
+@media (max-width: 640px) {
+  .calendar-grid {
+    gap: 0.3rem;
+  }
+  .calendar-cell {
+    padding: 0.3rem;
+    font-size: 0.8rem;
+  }
+  .day-number {
+    font-size: 0.9rem;
+  }
+  .bonus {
+    font-size: 1rem;
+  }
 }
