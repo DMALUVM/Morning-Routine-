@@ -1,38 +1,38 @@
-/* Custom Styles for Morning Routine Tracker */
-
+/* App Font & Layout */
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
-/* Modal behavior */
-#editModal {
-  display: none;
-}
-#editModal.show {
-  display: flex;
-}
-
-/* Calendar day box */
+/* Calendar Day Style */
 .calendar-day {
-  height: 80px;
+  aspect-ratio: 1 / 1;
+  border: 1px solid #d1d5db; /* Tailwind gray-300 */
   border-radius: 0.5rem;
-  cursor: pointer;
+  padding: 4px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 4px;
-  border: 1px solid transparent;
-  transition: background-color 0.2s, border 0.2s;
+  align-items: flex-start;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s ease;
 }
 
+/* Hover & Focus */
 .calendar-day:hover {
-  border-color: #60a5fa; /* Tailwind blue-400 */
+  border-color: #3b82f6; /* Tailwind blue-500 */
 }
 
-/* Completed status */
+/* Today highlight */
+.today {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+}
+
+/* Completion states */
 .complete {
-  background-color: #d1fae5; /* green-100 */
-  color: #065f46; /* green-800 */
+  background-color: #dcfce7; /* green-100 */
+  color: #166534; /* green-800 */
 }
 
 .incomplete {
@@ -40,31 +40,54 @@ body {
   color: #991b1b; /* red-800 */
 }
 
-/* Today highlight */
-.today {
-  outline: 2px solid #3b82f6; /* Tailwind blue-500 */
-  outline-offset: 1px;
+/* Status indicator in top right */
+.status-icon {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 1rem;
 }
 
-/* Emoji row */
-.emoji-row {
+/* Emoji badge row */
+.badge-row {
   font-size: 1rem;
-  line-height: 1.2;
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+/* Modal override */
+#editModal {
+  display: none;
+}
+#editModal.show {
+  display: flex;
+}
+
+/* Checkbox completed effect (strike through on label) */
+input[type="checkbox"]:checked + span {
+  text-decoration: line-through;
+  opacity: 0.7;
 }
 
 /* Dark mode overrides */
 @media (prefers-color-scheme: dark) {
-  .complete {
-    background-color: #064e3b; /* dark green */
-    color: #d1fae5;
-  }
-
-  .incomplete {
-    background-color: #7f1d1d; /* dark red */
-    color: #fee2e2;
+  .calendar-day {
+    border-color: #374151; /* dark gray */
   }
 
   .calendar-day:hover {
-    border-color: #93c5fd; /* lighter blue in dark mode */
+    border-color: #60a5fa;
+  }
+
+  .complete {
+    background-color: #14532d;
+    color: #bbf7d0;
+  }
+
+  .incomplete {
+    background-color: #7f1d1d;
+    color: #fecaca;
   }
 }
