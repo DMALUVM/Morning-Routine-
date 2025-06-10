@@ -1,63 +1,61 @@
-/* App Font & Layout */
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
-/* Calendar Day Style */
+/* Calendar Grid Boxes */
 .calendar-day {
-  aspect-ratio: 1 / 1;
-  border: 1px solid #d1d5db; /* Tailwind gray-300 */
+  width: 100%;
+  padding: 0.5rem;
+  height: 100px;
+  border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  padding: 4px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: flex-start;
-  cursor: pointer;
   position: relative;
-  transition: background 0.2s ease;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-/* Hover & Focus */
 .calendar-day:hover {
-  border-color: #3b82f6; /* Tailwind blue-500 */
+  border-color: #3b82f6;
 }
 
-/* Today highlight */
+/* Completion Status Icons */
+.status-icon {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 1rem;
+}
+
+/* Optional Badges (🔥🧊) */
+.badge-row {
+  font-size: 1rem;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+/* Today Outline */
 .today {
   outline: 2px solid #3b82f6;
   outline-offset: 1px;
 }
 
-/* Completion states */
+/* Completion Colors */
 .complete {
-  background-color: #dcfce7; /* green-100 */
-  color: #166534; /* green-800 */
+  background-color: #dcfce7;
+  color: #166534;
 }
 
 .incomplete {
-  background-color: #fee2e2; /* red-100 */
-  color: #991b1b; /* red-800 */
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
-/* Status indicator in top right */
-.status-icon {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  font-size: 1rem;
-}
-
-/* Emoji badge row */
-.badge-row {
-  font-size: 1rem;
-  margin-top: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-}
-
-/* Modal override */
+/* Modal Logic */
 #editModal {
   display: none;
 }
@@ -65,16 +63,16 @@ body {
   display: flex;
 }
 
-/* Checkbox completed effect (strike through on label) */
+/* Strike-through for Completed Items */
 input[type="checkbox"]:checked + span {
   text-decoration: line-through;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-/* Dark mode overrides */
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
   .calendar-day {
-    border-color: #374151; /* dark gray */
+    border-color: #374151;
   }
 
   .calendar-day:hover {
