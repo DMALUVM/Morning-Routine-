@@ -11,18 +11,18 @@ let selectedDate = null;
 let currentDate = new Date();
 let data = JSON.parse(localStorage.getItem("routineData") || "{}");
 
-// Activities and their emoji
 const activities = {
   breathwork: "🧘",
   hydration: "💧",
   reading: "📖",
   mobility: "🤸",
   exercise: "🏋️",
-  sauna: "🔥",
-  cold: "🧊",
+  sauna: "🔥", // optional
+  cold: "🧊",  // optional
 };
 
 const requiredKeys = ["breathwork", "hydration", "reading", "mobility", "exercise"];
+const optionalKeys = ["sauna", "cold"];
 
 function getDateKey(date) {
   return date.toISOString().split("T")[0];
@@ -37,6 +37,7 @@ function renderCalendar() {
   const startDay = firstDay.getDay();
   const daysInMonth = lastDay.getDate();
 
+  // Clear existing content (preserve day headers)
   calendarEl.innerHTML = `
     <div class="font-bold">Sun</div>
     <div class="font-bold">Mon</div>
@@ -48,45 +49,40 @@ function renderCalendar() {
   `;
 
   for (let i = 0; i < startDay; i++) {
-    const blank = document.createElement("div");
-    calendarEl.appendChild(blank);
+    calendarEl.appendChild(document.createElement("div"));
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
     const key = getDateKey(date);
     const entry = data[key] || {};
-    const completed = requiredKeys.every((k) => entry[k]);
+
+    const requiredComplete = requiredKeys.every(k => entry[k]);
+    const optionalCompleted = optionalKeys.filter(k => entry[k]).map(k => activities[k]);
 
     const dayEl = document.createElement("div");
-    dayEl.className = `calendar-day ${completed ? "complete" : "incomplete"}`;
-    if (getDateKey(new Date()) === key) dayEl.classList.add("today");
+    dayEl.className = `calendar-day ${requiredComplete ? "complete" : "incomplete"}`;
+    if (key === getDateKey(new Date())) dayEl.classList.add("today");
 
     dayEl.innerHTML = `
       <div class="text-xs font-semibold">${day}</div>
-      <div class="emoji-row">${Object.keys(entry)
-        .filter((k) => entry[k] && activities[k])
-        .map((k) => activities[k])
-        .join(" ")}</div>
+      <div class="status-icon">${requiredComplete ? "✅" : "❌"}</div>
+      <div class="badge-row">${optionalCompleted.join(" ")}</div>
     `;
+
     dayEl.addEventListener("click", () => openEditModal(key));
     calendarEl.appendChild(dayEl);
   }
 
-  monthYearEl.textContent = `${firstDay.toLocaleString("default", {
-    month: "long",
-  })} ${year}`;
-
+  monthYearEl.textContent = `${firstDay.toLocaleString("default", { month: "long" })} ${year}`;
   updateStats();
 }
 
 function updateStats() {
   let streak = 0;
   let ytd = 0;
-  const todayKey = getDateKey(new Date());
   let current = new Date();
 
-  // Check streak backward
   while (true) {
     const key = getDateKey(current);
     const entry = data[key];
@@ -99,7 +95,6 @@ function updateStats() {
     }
   }
 
-  // YTD required-complete counter
   for (const [key, entry] of Object.entries(data)) {
     if (
       key.startsWith(new Date().getFullYear()) &&
@@ -150,5 +145,4 @@ document.getElementById("nextMonth").addEventListener("click", () => {
   renderCalendar();
 });
 
-// Initial render
 renderCalendar();
