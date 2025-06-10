@@ -80,10 +80,12 @@ function renderCalendar() {
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   monthLabel.textContent = new Date(currentYear, currentMonth).toLocaleDateString('default', { month: 'long', year: 'numeric' });
 
+  // Empty cells for start of month
   for (let i = 0; i < firstDay; i++) {
     calendarGrid.innerHTML += '<div class="calendar-cell empty"></div>';
   }
 
+  // Days
   const required = activities.filter(a => a.required);
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(currentYear, currentMonth, d);
