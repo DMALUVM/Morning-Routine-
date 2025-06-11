@@ -25,8 +25,8 @@ const activities = {
 const requiredKeys = ["breathwork", "hydration", "reading", "mobility", "exercise"];
 const optionalKeys = ["sauna", "cold"];
 
+// Use local timezone (Maryland = America/New_York)
 function getLocalDate(date = new Date()) {
-  // Converts to America/New_York timezone (Maryland)
   return new Date(date.toLocaleString("en-US", { timeZone: "America/New_York" }));
 }
 
@@ -62,7 +62,6 @@ function renderCalendar() {
     const date = new Date(year, month, day);
     const key = getDateKey(date);
     const entry = data[key] || {};
-
     const requiredComplete = requiredKeys.every(k => entry[k]);
     const optionalCompleted = optionalKeys.filter(k => entry[k]).map(k => activities[k]);
 
@@ -76,6 +75,7 @@ function renderCalendar() {
       <div class="badge-row">${optionalCompleted.join(" ")}</div>
     `;
 
+    // 🛠️ Enable editing by clicking any day
     dayEl.addEventListener("click", () => openEditModal(key));
     calendarEl.appendChild(dayEl);
   }
@@ -104,8 +104,8 @@ function updateStats() {
 
   for (const [key, entry] of Object.entries(data)) {
     if (
-      key.startsWith(getLocalDate().getFullYear()) &&
-      requiredKeys.every((k) => entry[k])
+      key.startsWith(getLocalDate().getFullYear().toString()) &&
+      requiredKeys.every(k => entry[k])
     ) {
       ytd++;
     }
@@ -143,11 +143,13 @@ todayForm.addEventListener("submit", (e) => {
 function openEditModal(dateKey) {
   selectedDate = dateKey;
   const entry = data[dateKey] || {};
+
   for (const el of editForm.elements) {
     if (el.type === "checkbox") {
       el.checked = !!entry[el.name];
     }
   }
+
   editModal.classList.add("show");
 }
 
@@ -179,5 +181,5 @@ document.getElementById("nextMonth").addEventListener("click", () => {
   renderCalendar();
 });
 
-// Initialize
+// 🔄 Start it all
 renderCalendar();
