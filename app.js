@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     breathwork: "🧘",
     hydration: "💧",
     reading: "📖",
-    mobility: "🠸",
+    mobility: "🤸",
     exercise: "🏋️",
     supplements: "💊",
     sauna: "🔥",
@@ -115,21 +115,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateTodayForm() {
     const todayKey = getDateKey(new Date());
-    const lastUpdated = localStorage.getItem("lastUpdatedKey");
+    const entry = data[todayKey] || {};
 
-    if (lastUpdated !== todayKey) {
-      for (const el of todayForm.elements) {
-        if (el.type === "checkbox") {
-          el.checked = false;
-        }
-      }
-      localStorage.setItem("lastUpdatedKey", todayKey);
-    } else {
-      const entry = data[todayKey] || {};
-      for (const el of todayForm.elements) {
-        if (el.type === "checkbox") {
-          el.checked = !!entry[el.name];
-        }
+    for (const el of todayForm.elements) {
+      if (el.type === "checkbox") {
+        el.checked = !!entry[el.name];
       }
     }
   }
@@ -145,7 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const todayKey = getDateKey(new Date());
     data[todayKey] = result;
     localStorage.setItem("routineData", JSON.stringify(data));
-    localStorage.setItem("lastUpdatedKey", todayKey);
     renderCalendar();
   });
 
