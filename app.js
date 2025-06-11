@@ -54,12 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
       calendarEl.appendChild(header);
     });
 
-    // Add blank cells for the first week
     for (let i = 0; i < startDay; i++) {
       calendarEl.appendChild(document.createElement("div"));
     }
 
-    // Add day cells
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const key = getDateKey(date);
@@ -105,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     for (const [key, entry] of Object.entries(data)) {
       if (key.startsWith(getLocalDate().getFullYear().toString()) &&
-          requiredKeys.every(k => entry[k])) {
+        requiredKeys.every(k => entry[k])) {
         ytd++;
       }
     }
@@ -180,6 +178,5 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCalendar();
   });
 
-  // Initial render
   renderCalendar();
 });
