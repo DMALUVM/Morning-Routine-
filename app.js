@@ -1,3 +1,5 @@
+// Final working app.js for Morning Routine Tracker
+
 document.addEventListener("DOMContentLoaded", () => {
   const calendarEl = document.getElementById("calendar");
   const monthYearEl = document.getElementById("monthYear");
@@ -19,11 +21,12 @@ document.addEventListener("DOMContentLoaded", () => {
     reading: "📖",
     mobility: "🤸",
     exercise: "🏋️",
+    supplements: "💊",
     sauna: "🔥",
     cold: "🧊",
   };
 
-  const requiredKeys = ["breathwork", "hydration", "reading", "mobility", "exercise"];
+  const requiredKeys = ["breathwork", "hydration", "reading", "mobility", "exercise", "supplements"];
   const optionalKeys = ["sauna", "cold"];
 
   function getLocalDate(date = new Date()) {
@@ -101,8 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     for (const [key, entry] of Object.entries(data)) {
-      if (key.startsWith(getLocalDate().getFullYear().toString()) &&
-          requiredKeys.every(k => entry[k])) {
+      if (key.startsWith(getLocalDate().getFullYear().toString()) && requiredKeys.every(k => entry[k])) {
         ytd++;
       }
     }
@@ -113,11 +115,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateTodayForm() {
     const todayKey = getDateKey(new Date());
-    const entry = data[todayKey] || {};
+    const lastKey = localStorage.getItem("lastUpdatedKey");
 
-    for (const el of todayForm.elements) {
-      if (el.type === "checkbox") {
-        el.checked = !!entry[el.name];
+    if (lastKey !== todayKey) {
+      for (const el of todayForm.elements) {
+        if (el.type === "checkbox") {
+          el.checked = false;
+        }
+      }
+      localStorage.setItem("lastUpdatedKey", todayKey);
+    } else {
+      const entry = data[todayKey] || {};
+      for (const el of todayForm.elements) {
+        if (el.type === "checkbox") {
+          el.checked = !!entry[el.name];
+        }
       }
     }
   }
@@ -133,6 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const todayKey = getDateKey(new Date());
     data[todayKey] = result;
     localStorage.setItem("routineData", JSON.stringify(data));
+    localStorage.setItem("lastUpdatedKey", todayKey);
     renderCalendar();
   });
 
