@@ -1,5 +1,3 @@
-// Final updated app.js for Morning Routine Tracker
-
 document.addEventListener("DOMContentLoaded", () => {
   const calendarEl = document.getElementById("calendar");
   const monthYearEl = document.getElementById("monthYear");
@@ -49,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     calendarEl.innerHTML = "";
 
+    // Day headers
     ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(day => {
       const header = document.createElement("div");
       header.className = "font-bold";
@@ -104,7 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     for (const [key, entry] of Object.entries(data)) {
-      if (key.startsWith(getLocalDate().getFullYear().toString()) && requiredKeys.every(k => entry[k])) {
+      if (key.startsWith(getLocalDate().getFullYear().toString()) &&
+          requiredKeys.every(k => entry[k])) {
         ytd++;
       }
     }
@@ -149,6 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     editModal.classList.add("show");
+    editModal.classList.remove("hidden");
   }
 
   editForm.addEventListener("submit", (e) => {
@@ -162,11 +163,13 @@ document.addEventListener("DOMContentLoaded", () => {
     data[selectedDate] = result;
     localStorage.setItem("routineData", JSON.stringify(data));
     editModal.classList.remove("show");
+    editModal.classList.add("hidden");
     renderCalendar();
   });
 
   cancelEdit.addEventListener("click", () => {
     editModal.classList.remove("show");
+    editModal.classList.add("hidden");
   });
 
   document.getElementById("prevMonth").addEventListener("click", () => {
@@ -179,5 +182,14 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCalendar();
   });
 
+  // Reset today's form if no entry yet
+  function checkMidnightReset() {
+    const todayKey = getDateKey(new Date());
+    if (!data[todayKey]) {
+      updateTodayForm(); // all checkboxes will default to unchecked
+    }
+  }
+
   renderCalendar();
+  checkMidnightReset();
 });
