@@ -19,12 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
     reading: "📖",
     mobility: "🤸",
     exercise: "🏋️",
-    supplements: "💊",
     sauna: "🔥",
     cold: "🧊",
   };
 
-  const requiredKeys = ["breathwork", "hydration", "reading", "mobility", "exercise", "supplements"];
+  const requiredKeys = ["breathwork", "hydration", "reading", "mobility", "exercise"];
   const optionalKeys = ["sauna", "cold"];
 
   function getLocalDate(date = new Date()) {
@@ -47,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     calendarEl.innerHTML = "";
 
-    // Day headers
     ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(day => {
       const header = document.createElement("div");
       header.className = "font-bold";
@@ -162,15 +160,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     data[selectedDate] = result;
     localStorage.setItem("routineData", JSON.stringify(data));
-    editModal.classList.remove("show");
-    editModal.classList.add("hidden");
+    closeModal();
     renderCalendar();
   });
 
   cancelEdit.addEventListener("click", () => {
+    closeModal();
+  });
+
+  function closeModal() {
     editModal.classList.remove("show");
     editModal.classList.add("hidden");
-  });
+  }
 
   document.getElementById("prevMonth").addEventListener("click", () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
@@ -182,14 +183,5 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCalendar();
   });
 
-  // Reset today's form if no entry yet
-  function checkMidnightReset() {
-    const todayKey = getDateKey(new Date());
-    if (!data[todayKey]) {
-      updateTodayForm(); // all checkboxes will default to unchecked
-    }
-  }
-
   renderCalendar();
-  checkMidnightReset();
 });
