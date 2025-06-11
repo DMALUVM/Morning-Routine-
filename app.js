@@ -25,7 +25,6 @@ const activities = {
 const requiredKeys = ["breathwork", "hydration", "reading", "mobility", "exercise"];
 const optionalKeys = ["sauna", "cold"];
 
-// Use local timezone (Maryland = America/New_York)
 function getLocalDate(date = new Date()) {
   return new Date(date.toLocaleString("en-US", { timeZone: "America/New_York" }));
 }
@@ -75,7 +74,6 @@ function renderCalendar() {
       <div class="badge-row">${optionalCompleted.join(" ")}</div>
     `;
 
-    // 🛠️ Enable editing by clicking any day
     dayEl.addEventListener("click", () => openEditModal(key));
     calendarEl.appendChild(dayEl);
   }
@@ -181,5 +179,4 @@ document.getElementById("nextMonth").addEventListener("click", () => {
   renderCalendar();
 });
 
-// 🔄 Start it all
 renderCalendar();
