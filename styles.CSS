@@ -16,6 +16,7 @@ body {
   position: relative;
   cursor: pointer;
   transition: background-color 0.2s;
+  background-color: #ffffff;
 }
 
 .calendar-day:hover {
@@ -59,7 +60,7 @@ body {
   position: relative;
 }
 
-/* Modal show toggle */
+/* Modal visibility */
 #editModal {
   display: none;
 }
@@ -67,16 +68,17 @@ body {
   display: flex;
 }
 
-/* Strike-through on completed items */
+/* Strike-through for completed */
 input[type="checkbox"]:checked + span {
   text-decoration: line-through;
   opacity: 0.6;
 }
 
-/* Dark mode support */
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   .calendar-day {
     border-color: #374151;
+    background-color: #1f2937;
   }
 
   .calendar-day:hover {
