@@ -70,17 +70,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const optionalCompleted = optionalKeys.filter(k => entry[k]).map(k => activities[k]);
 
       const dayEl = document.createElement("div");
-      if (key === todayKey) dayEl.classList.add("today");
+      dayEl.className = "calendar-day";
+
+      if (key === todayKey) {
+        dayEl.classList.add("today");
+      }
 
       if (isFuture && !data[key]) {
-        dayEl.className = "calendar-day future";
         dayEl.innerHTML = `
           <div class="text-xs font-semibold">${day}</div>
           <div class="status-icon">--</div>
           <div class="badge-row"></div>
         `;
       } else {
-        dayEl.className = `calendar-day ${requiredComplete ? "complete" : "incomplete"}`;
+        dayEl.classList.add(requiredComplete ? "complete" : "incomplete");
         dayEl.innerHTML = `
           <div class="text-xs font-semibold">${day}</div>
           <div class="status-icon">${requiredComplete ? "✅" : "❌"}</div>
