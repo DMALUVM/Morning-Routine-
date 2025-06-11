@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     breathwork: "🧘",
     hydration: "💧",
     reading: "📖",
-    mobility: "🤸",
+    mobility: "🠸",
     exercise: "🏋️",
     supplements: "💊",
     sauna: "🔥",
@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     calendarEl.innerHTML = "";
 
-    // Add weekday headers
     ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(day => {
       const header = document.createElement("div");
       header.className = "font-bold";
@@ -116,17 +115,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateTodayForm() {
     const todayKey = getDateKey(new Date());
-    const entry = data[todayKey] || {};
+    const lastUpdated = localStorage.getItem("lastUpdatedKey");
 
-    for (const el of todayForm.elements) {
-      if (el.type === "checkbox") {
-        el.checked = false;
+    if (lastUpdated !== todayKey) {
+      for (const el of todayForm.elements) {
+        if (el.type === "checkbox") {
+          el.checked = false;
+        }
       }
-    }
-
-    for (const el of todayForm.elements) {
-      if (el.type === "checkbox" && entry[el.name]) {
-        el.checked = true;
+      localStorage.setItem("lastUpdatedKey", todayKey);
+    } else {
+      const entry = data[todayKey] || {};
+      for (const el of todayForm.elements) {
+        if (el.type === "checkbox") {
+          el.checked = !!entry[el.name];
+        }
       }
     }
   }
@@ -142,6 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const todayKey = getDateKey(new Date());
     data[todayKey] = result;
     localStorage.setItem("routineData", JSON.stringify(data));
+    localStorage.setItem("lastUpdatedKey", todayKey);
     renderCalendar();
   });
 
