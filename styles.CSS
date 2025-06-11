@@ -1,8 +1,9 @@
+/* Base font and layout */
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 }
 
-/* Calendar Grid Boxes */
+/* Calendar day layout */
 .calendar-day {
   width: 100%;
   padding: 0.5rem;
@@ -21,7 +22,7 @@ body {
   border-color: #3b82f6;
 }
 
-/* Completion Status Icons */
+/* Status icon in top-right */
 .status-icon {
   position: absolute;
   top: 4px;
@@ -29,7 +30,7 @@ body {
   font-size: 1rem;
 }
 
-/* Optional Badges (🔥🧊) */
+/* Optional activity emojis */
 .badge-row {
   font-size: 1rem;
   display: flex;
@@ -38,13 +39,7 @@ body {
   margin-top: auto;
 }
 
-/* Today Outline */
-.today {
-  outline: 2px solid #3b82f6;
-  outline-offset: 1px;
-}
-
-/* Completion Colors */
+/* Completed day styles */
 .complete {
   background-color: #dcfce7;
   color: #166534;
@@ -55,7 +50,16 @@ body {
   color: #991b1b;
 }
 
-/* Modal Logic */
+/* Highlight current day with border + shadow */
+.today {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #3b82f6;
+  z-index: 1;
+  position: relative;
+}
+
+/* Modal visibility */
 #editModal {
   display: none;
 }
@@ -63,13 +67,13 @@ body {
   display: flex;
 }
 
-/* Strike-through for Completed Items */
+/* Checkbox strike-through effect */
 input[type="checkbox"]:checked + span {
   text-decoration: line-through;
   opacity: 0.6;
 }
 
-/* Dark Mode */
+/* Dark mode overrides */
 @media (prefers-color-scheme: dark) {
   .calendar-day {
     border-color: #374151;
@@ -87,5 +91,9 @@ input[type="checkbox"]:checked + span {
   .incomplete {
     background-color: #7f1d1d;
     color: #fecaca;
+  }
+
+  .today {
+    box-shadow: 0 0 0 2px #1f2937, 0 0 0 4px #3b82f6;
   }
 }
