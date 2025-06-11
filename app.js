@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     calendarEl.innerHTML = "";
 
+    // Add weekday headers
     ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(day => {
       const header = document.createElement("div");
       header.className = "font-bold";
@@ -102,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     for (const [key, entry] of Object.entries(data)) {
       if (key.startsWith(getLocalDate().getFullYear().toString()) &&
-          requiredKeys.every(k => entry[k])) {
+        requiredKeys.every(k => entry[k])) {
         ytd++;
       }
     }
@@ -147,7 +148,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     editModal.classList.add("show");
-    editModal.classList.remove("hidden");
   }
 
   editForm.addEventListener("submit", (e) => {
@@ -160,18 +160,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     data[selectedDate] = result;
     localStorage.setItem("routineData", JSON.stringify(data));
-    closeModal();
+    editModal.classList.remove("show");
     renderCalendar();
   });
 
   cancelEdit.addEventListener("click", () => {
-    closeModal();
-  });
-
-  function closeModal() {
     editModal.classList.remove("show");
-    editModal.classList.add("hidden");
-  }
+  });
 
   document.getElementById("prevMonth").addEventListener("click", () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
