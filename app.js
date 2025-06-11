@@ -1,4 +1,4 @@
-// Final working app.js for Morning Routine Tracker — updated with fixed Today’s Checklist, blank future days, and better current day highlight
+// Final working app.js for Morning Routine Tracker — fixed current day highlight and future "--" logic
 
 document.addEventListener("DOMContentLoaded", () => {
   const calendarEl = document.getElementById("calendar");
@@ -40,8 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderCalendar() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    const todayKey = getDateKey(new Date());
     const now = getLocalDate();
+    const todayKey = getDateKey(now);
 
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -72,11 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const dayEl = document.createElement("div");
       dayEl.className = "calendar-day";
 
-      if (key === todayKey) {
-        dayEl.classList.add("today");
-      }
+      if (key === todayKey) dayEl.classList.add("today");
 
-      if (isFuture && !data[key]) {
+      if (isFuture && key !== todayKey && !data[key]) {
         dayEl.innerHTML = `
           <div class="text-xs font-semibold">${day}</div>
           <div class="status-icon">--</div>
