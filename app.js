@@ -124,12 +124,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
       localStorage.setItem("lastUpdatedKey", todayKey);
-    } else {
-      const entry = data[todayKey] || {};
-      for (const el of todayForm.elements) {
-        if (el.type === "checkbox") {
-          el.checked = !!entry[el.name];
-        }
+    }
+
+    const entry = data[todayKey] || {};
+    for (const el of todayForm.elements) {
+      if (el.type === "checkbox") {
+        el.checked = !!entry[el.name];
       }
     }
   }
