@@ -25,13 +25,19 @@ const activities = {
 const requiredKeys = ["breathwork", "hydration", "reading", "mobility", "exercise"];
 const optionalKeys = ["sauna", "cold"];
 
+function getLocalDate(date = new Date()) {
+  // Converts to America/New_York timezone (Maryland)
+  return new Date(date.toLocaleString("en-US", { timeZone: "America/New_York" }));
+}
+
 function getDateKey(date) {
-  return date.toISOString().split("T")[0];
+  return getLocalDate(date).toISOString().split("T")[0];
 }
 
 function renderCalendar() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+  const todayKey = getDateKey(new Date());
 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
@@ -62,7 +68,7 @@ function renderCalendar() {
 
     const dayEl = document.createElement("div");
     dayEl.className = `calendar-day ${requiredComplete ? "complete" : "incomplete"}`;
-    if (key === getDateKey(new Date())) dayEl.classList.add("today");
+    if (key === todayKey) dayEl.classList.add("today");
 
     dayEl.innerHTML = `
       <div class="text-xs font-semibold">${day}</div>
@@ -76,18 +82,18 @@ function renderCalendar() {
 
   monthYearEl.textContent = `${firstDay.toLocaleString("default", { month: "long" })} ${year}`;
   updateStats();
-  updateTodayForm(); // Refresh today’s checklist
+  updateTodayForm();
 }
 
 function updateStats() {
   let streak = 0;
   let ytd = 0;
-  let current = new Date();
+  let current = getLocalDate();
 
   while (true) {
     const key = getDateKey(current);
     const entry = data[key];
-    const ok = entry && requiredKeys.every((k) => entry[k]);
+    const ok = entry && requiredKeys.every(k => entry[k]);
     if (ok) {
       streak++;
       current.setDate(current.getDate() - 1);
@@ -98,7 +104,7 @@ function updateStats() {
 
   for (const [key, entry] of Object.entries(data)) {
     if (
-      key.startsWith(new Date().getFullYear()) &&
+      key.startsWith(getLocalDate().getFullYear()) &&
       requiredKeys.every((k) => entry[k])
     ) {
       ytd++;
@@ -131,7 +137,7 @@ todayForm.addEventListener("submit", (e) => {
   const todayKey = getDateKey(new Date());
   data[todayKey] = result;
   localStorage.setItem("routineData", JSON.stringify(data));
-  renderCalendar(); // refresh view
+  renderCalendar();
 });
 
 function openEditModal(dateKey) {
