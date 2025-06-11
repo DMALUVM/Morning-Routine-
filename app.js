@@ -1,4 +1,4 @@
-// Final working app.js for Morning Routine Tracker — updated
+// Final working app.js for Morning Routine Tracker — updated with fixed Today’s Checklist, blank future days, and better current day highlight
 
 document.addEventListener("DOMContentLoaded", () => {
   const calendarEl = document.getElementById("calendar");
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     breathwork: "🧘",
     hydration: "💧",
     reading: "📖",
-    mobility: "��",
+    mobility: "🤸",
     exercise: "🏋️",
     supplements: "💊",
     sauna: "🔥",
@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const todayKey = getDateKey(new Date());
+    const now = getLocalDate();
 
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -63,19 +64,29 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const key = getDateKey(date);
+      const isFuture = date > now;
       const entry = data[key] || {};
       const requiredComplete = requiredKeys.every(k => entry[k]);
       const optionalCompleted = optionalKeys.filter(k => entry[k]).map(k => activities[k]);
 
       const dayEl = document.createElement("div");
-      dayEl.className = `calendar-day ${requiredComplete ? "complete" : "incomplete"}`;
       if (key === todayKey) dayEl.classList.add("today");
 
-      dayEl.innerHTML = `
-        <div class="text-xs font-semibold">${day}</div>
-        <div class="status-icon">${requiredComplete ? "✅" : "❌"}</div>
-        <div class="badge-row">${optionalCompleted.join(" ")}</div>
-      `;
+      if (isFuture && !data[key]) {
+        dayEl.className = "calendar-day future";
+        dayEl.innerHTML = `
+          <div class="text-xs font-semibold">${day}</div>
+          <div class="status-icon">--</div>
+          <div class="badge-row"></div>
+        `;
+      } else {
+        dayEl.className = `calendar-day ${requiredComplete ? "complete" : "incomplete"}`;
+        dayEl.innerHTML = `
+          <div class="text-xs font-semibold">${day}</div>
+          <div class="status-icon">${requiredComplete ? "✅" : "❌"}</div>
+          <div class="badge-row">${optionalCompleted.join(" ")}</div>
+        `;
+      }
 
       dayEl.addEventListener("click", () => openEditModal(key));
       calendarEl.appendChild(dayEl);
@@ -117,7 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const todayKey = getDateKey(new Date());
     const lastCheckedKey = localStorage.getItem("lastCheckedDate") || "";
 
-    // If it's a new day, reset the form values to blank checkboxes
     if (lastCheckedKey !== todayKey) {
       for (const el of todayForm.elements) {
         if (el.type === "checkbox") {
@@ -126,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       localStorage.setItem("lastCheckedDate", todayKey);
     } else {
-      // If same day, fill in saved values
       const entry = data[todayKey] || {};
       for (const el of todayForm.elements) {
         if (el.type === "checkbox") {
