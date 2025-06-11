@@ -1,4 +1,4 @@
-// Final working app.js for Morning Routine Tracker — fixed current day highlight and future "--" logic
+// Final working app.js for Morning Routine Tracker — FIXED today highlight & future -- logic
 
 document.addEventListener("DOMContentLoaded", () => {
   const calendarEl = document.getElementById("calendar");
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const now = getLocalDate();
-    const todayKey = getDateKey(now);
+    const nowKey = getDateKey(now);
 
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -64,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const key = getDateKey(date);
-      const isFuture = date > now;
       const entry = data[key] || {};
       const requiredComplete = requiredKeys.every(k => entry[k]);
       const optionalCompleted = optionalKeys.filter(k => entry[k]).map(k => activities[k]);
@@ -72,9 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const dayEl = document.createElement("div");
       dayEl.className = "calendar-day";
 
-      if (key === todayKey) dayEl.classList.add("today");
+      if (key === nowKey) {
+        dayEl.classList.add("today");
+      }
 
-      if (isFuture && key !== todayKey && !data[key]) {
+      if (key > nowKey && !data[key]) {
         dayEl.innerHTML = `
           <div class="text-xs font-semibold">${day}</div>
           <div class="status-icon">--</div>
