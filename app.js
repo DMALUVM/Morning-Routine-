@@ -5,6 +5,7 @@ const ytdEl = document.getElementById("ytd");
 
 const editModal = document.getElementById("editModal");
 const editForm = document.getElementById("editForm");
+const todayForm = document.getElementById("todayForm");
 const cancelEdit = document.getElementById("cancelEdit");
 
 let selectedDate = null;
@@ -37,7 +38,6 @@ function renderCalendar() {
   const startDay = firstDay.getDay();
   const daysInMonth = lastDay.getDate();
 
-  // Preserve day headers
   calendarEl.innerHTML = `
     <div class="font-bold">Sun</div>
     <div class="font-bold">Mon</div>
@@ -76,6 +76,7 @@ function renderCalendar() {
 
   monthYearEl.textContent = `${firstDay.toLocaleString("default", { month: "long" })} ${year}`;
   updateStats();
+  updateTodayForm(); // Refresh today’s checklist
 }
 
 function updateStats() {
@@ -86,7 +87,7 @@ function updateStats() {
   while (true) {
     const key = getDateKey(current);
     const entry = data[key];
-    const ok = entry && requiredKeys.every(k => entry[k]);
+    const ok = entry && requiredKeys.every((k) => entry[k]);
     if (ok) {
       streak++;
       current.setDate(current.getDate() - 1);
@@ -108,6 +109,31 @@ function updateStats() {
   ytdEl.textContent = `📆 YTD: ${ytd} day${ytd === 1 ? "" : "s"}`;
 }
 
+function updateTodayForm() {
+  const todayKey = getDateKey(new Date());
+  const entry = data[todayKey] || {};
+
+  for (const el of todayForm.elements) {
+    if (el.type === "checkbox") {
+      el.checked = !!entry[el.name];
+    }
+  }
+}
+
+todayForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const formData = new FormData(todayForm);
+  const result = {};
+  for (const key of Object.keys(activities)) {
+    result[key] = formData.get(key) === "on";
+  }
+
+  const todayKey = getDateKey(new Date());
+  data[todayKey] = result;
+  localStorage.setItem("routineData", JSON.stringify(data));
+  renderCalendar(); // refresh view
+});
+
 function openEditModal(dateKey) {
   selectedDate = dateKey;
   const entry = data[dateKey] || {};
@@ -126,6 +152,7 @@ editForm.addEventListener("submit", (e) => {
   for (const key of Object.keys(activities)) {
     result[key] = formData.get(key) === "on";
   }
+
   data[selectedDate] = result;
   localStorage.setItem("routineData", JSON.stringify(data));
   editModal.classList.remove("show");
