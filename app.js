@@ -1,4 +1,4 @@
-// Final working app.js for Morning Routine Tracker
+// Final working app.js for Morning Routine Tracker — updated
 
 document.addEventListener("DOMContentLoaded", () => {
   const calendarEl = document.getElementById("calendar");
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     breathwork: "🧘",
     hydration: "💧",
     reading: "📖",
-    mobility: "🤸",
+    mobility: "��",
     exercise: "🏋️",
     supplements: "💊",
     sauna: "🔥",
@@ -115,21 +115,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateTodayForm() {
     const todayKey = getDateKey(new Date());
-    const lastKey = localStorage.getItem("lastUpdatedKey");
+    const lastCheckedKey = localStorage.getItem("lastCheckedDate") || "";
 
-    if (lastKey !== todayKey) {
+    // If it's a new day, reset the form values to blank checkboxes
+    if (lastCheckedKey !== todayKey) {
       for (const el of todayForm.elements) {
         if (el.type === "checkbox") {
           el.checked = false;
         }
       }
-      localStorage.setItem("lastUpdatedKey", todayKey);
-    }
-
-    const entry = data[todayKey] || {};
-    for (const el of todayForm.elements) {
-      if (el.type === "checkbox") {
-        el.checked = !!entry[el.name];
+      localStorage.setItem("lastCheckedDate", todayKey);
+    } else {
+      // If same day, fill in saved values
+      const entry = data[todayKey] || {};
+      for (const el of todayForm.elements) {
+        if (el.type === "checkbox") {
+          el.checked = !!entry[el.name];
+        }
       }
     }
   }
@@ -145,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const todayKey = getDateKey(new Date());
     data[todayKey] = result;
     localStorage.setItem("routineData", JSON.stringify(data));
-    localStorage.setItem("lastUpdatedKey", todayKey);
+    localStorage.setItem("lastCheckedDate", todayKey);
     renderCalendar();
   });
 
